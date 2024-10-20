@@ -36,6 +36,7 @@ class GuestbookEntry {
 
 	private @Id @GeneratedValue Long id;
 	private final String name, text;
+	private final String email;
 	private final LocalDateTime date;
 
 	/**
@@ -44,13 +45,15 @@ class GuestbookEntry {
 	 * @param name must not be {@literal null} or empty
 	 * @param text must not be {@literal null} or empty
 	 */
-	public GuestbookEntry(String name, String text) {
+	public GuestbookEntry(String name, String text, String email) {
 
 		Assert.hasText(name, "Name must not be null or empty!");
 		Assert.hasText(text, "Text must not be null or empty!");
+		Assert.hasText(email, "Email must not be null or empty!");
 
 		this.name = name;
 		this.text = text;
+		this.email = email;
 		this.date = LocalDateTime.now();
 	}
 
@@ -58,6 +61,7 @@ class GuestbookEntry {
 	private GuestbookEntry() {
 		this.name = null;
 		this.text = null;
+		this.email = null;
 		this.date = null;
 	}
 
@@ -75,5 +79,9 @@ class GuestbookEntry {
 
 	public String getText() {
 		return text;
+	}
+
+	public String getEmail() {
+		return email;
 	}
 }
