@@ -32,7 +32,7 @@
 								<span class="fas fa-times"></span>
 							</button>
 						</form>
-						<h4 class="card-title">[[|${index}. ${entry.name}|]] <small class="text-body-secondary">[[|(${entry.email})|]]</small></h4>
+						<h4 class="card-title">[[|${index}. ${entry.name}|]] <small sec:authorize="hasRole('ADMIN')" class="text-body-secondary">[[|(${entry.email})|]]</small></h4>
 					</div>
 					<div class="card-body">
 						<blockquote class="entry-text" th:text="${entry.text}"></blockquote>
