@@ -38,15 +38,28 @@ class GuestbookEntry {
 	private final String name, text;
 	private final String email;
 	private final LocalDateTime date;
+	private final LocalDateTime lastEditDate;
 
 	/**
-	 * Creates a new {@link GuestbookEntry} for the given name and text.
+	 * Creates a new {@link GuestbookEntry} for the given name, text and email.
 	 *
 	 * @param name must not be {@literal null} or empty
 	 * @param text must not be {@literal null} or empty
+	 * @param email must not be {@literal null} or empty
 	 */
 	public GuestbookEntry(String name, String text, String email) {
+		this(name, text, email, null);
+	}
 
+	/**
+	 * Creates a new {@link GuestbookEntry} for the given name, text, email and date.
+	 *
+	 * @param name must not be {@literal null} or empty
+	 * @param text must not be {@literal null} or empty
+	 * @param email must not be {@literal null} or empty
+	 * @param date the creation date of the entry or {@literal null}, i.e. now
+	 */
+	public GuestbookEntry(String name, String text, String email, LocalDateTime date) {
 		Assert.hasText(name, "Name must not be null or empty!");
 		Assert.hasText(text, "Text must not be null or empty!");
 		Assert.hasText(email, "Email must not be null or empty!");
@@ -54,7 +67,14 @@ class GuestbookEntry {
 		this.name = name;
 		this.text = text;
 		this.email = email;
-		this.date = LocalDateTime.now();
+
+		if (date == null) {
+			this.date = LocalDateTime.now();
+			this.lastEditDate = null;
+		} else {
+			this.date = date;
+			this.lastEditDate = LocalDateTime.now();
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -63,6 +83,7 @@ class GuestbookEntry {
 		this.text = null;
 		this.email = null;
 		this.date = null;
+		this.lastEditDate = null;
 	}
 
 	public String getName() {
@@ -83,5 +104,9 @@ class GuestbookEntry {
 
 	public String getEmail() {
 		return email;
+	}
+
+	public LocalDateTime getLastEditDate() {
+		return lastEditDate;
 	}
 }

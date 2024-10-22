@@ -21,7 +21,7 @@
 		<br />
 
 		<div id="entries" class="mx-auto">
-			<div th:each="entry, it : ${entries}" th:with="index = ${it.count}" th:fragment="entries">
+			<div th:each="entry, it : ${entries}" th:with="index=${it.count}" th:fragment="entries">
 				<div class="card" th:fragment="entry" th:id="entry+${entry.id}">
 					<div class="card-header">
 						<form sec:authorize="hasRole('ADMIN')" th:method="delete" th:action="@{/guestbook/{id}(id=${entry.id})}" th:attr="data-entry-id=${entry.id}">
@@ -32,13 +32,19 @@
 								<span class="fas fa-times"></span>
 							</button>
 						</form>
-						<h4 class="card-title">[[|${index}. ${entry.name}|]] <small sec:authorize="hasRole('ADMIN')" class="text-body-secondary">[[|(${entry.email})|]]</small></h4>
+						<form sec:authorize="hasRole('ADMIN')" method="get" th:action="@{/guestbook/{id}(id=${entry.id})}" th:attr="data-entry-id=${entry.id}">
+							<button th:title="#{guestbook.form.edit}" class="btn btn-sm float-right"
+							        hx:get="@{/guestbook/{id}(id=${entry.id},index=${index})}" hx:target="|#entry${entry.id}|" hx-swap="outerHTML">
+								<span class="fa-solid fa-pen-to-square"></span>
+							</button>
+						</form>
+						<h4 class="card-title">[[|${index}. ${entry.name}|]] <small sec:authorize="hasRole('ADMIN')" class="text-body-secondary" th:text="|(${entry.email})|" /></h4>
 					</div>
 					<div class="card-body">
 						<blockquote class="entry-text" th:text="${entry.text}"></blockquote>
 					</div>
 					<div class="card-footer">
-						<footer class="date" th:text="${#temporals.format(entry.date, 'dd. MMMM yyyy - HH:mm')}">Datum</footer>
+						<footer class="date">[[${#temporals.format(entry.date, 'dd. MMMM yyyy - HH:mm')}]] <span th:if="${entry.lastEditDate}" class="text-body-secondary position-absolute end-0 px-1" th:text="|Last edit: ${#temporals.format(entry.lastEditDate, 'dd. MMMM yyyy - HH:mm')}|">Edit date</span></footer>
 					</div>
 				</div>
 			</div>

@@ -15,6 +15,8 @@
  */
 package guestbook;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -93,5 +95,16 @@ class GuestbookForm {
 	 */
 	GuestbookEntry toNewEntry() {
 		return new GuestbookEntry(getName(), getText(), getEmail());
+	}
+
+	/**
+	 * Returns a new {@link GuestbookEntry} using the data submitted in the request and a given {@code date}.
+	 *
+	 * @param date the creation date of the new entry
+	 * @return the newly created {@link GuestbookEntry}
+	 * @throws IllegalArgumentException if you call this on an instance without the name and text actually set.
+	 */
+	GuestbookEntry toNewEntry(LocalDateTime date) {
+		return new GuestbookEntry(getName(), getText(), getEmail(), date);
 	}
 }

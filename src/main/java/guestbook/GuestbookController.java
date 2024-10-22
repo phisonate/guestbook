@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -178,6 +179,59 @@ class GuestbookController {
 					.view("guestbook :: entries")
 					.build();
 
+		}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	}
+
+	/**
+	 * Handles AJAX requests to get {@link GuestbookEntry}s for editing.
+	 *
+	 * @param entry an {@link Optional} with the {@link GuestbookEntry} to
+	 * delete
+	 * @return a response entity indicating success or failure
+	 * @throws ResponseStatusException if the entry couldn't be found
+	 */
+	@HxRequest
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping(path = "/guestbook/{entry}")
+	HtmxResponse getEntryHtmx(@PathVariable Optional<GuestbookEntry> entry, @RequestParam long index, Model model) {
+		return entry.map(e -> {
+			model.addAttribute("form", new GuestbookForm(e.getName(), e.getText(), e.getEmail()));
+			model.addAttribute("entry_id", e.getId());
+			model.addAttribute("index", index);
+
+			return new HtmxResponse.Builder()
+					.view("edit_form :: edit_form")
+					.build();
+		}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	}
+
+	/**
+	 * Handles AJAX requests to update a {@link GuestbookEntry}. Instead of rendering a complete page, this view only
+	 * renders and returns the HTML fragment representing the newly created entry.
+	 * <p>
+	 * Note that we do not react explicitly to a validation error: in such a case, Spring automatically returns an
+	 * appropriate JSON document describing the error.
+	 *
+	 * @param form the form submitted by the user
+	 * @param model the model that's used to render the view
+	 * @return a reference to a Thymeleaf template fragment
+	 * @see #addEntry(GuestbookForm, Errors, Model)
+	 */
+	@HxRequest
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping(path = "/guestbook/update/{entry}")
+	HtmxResponse updateEntryHx(@Valid GuestbookForm form, @PathVariable Optional<GuestbookEntry> entry, @RequestParam long index, Model model) {
+		return entry.map(e -> {
+			guestbook.delete(e);
+			final var newEntry = form.toNewEntry(e.getDate());
+			guestbook.save(newEntry);
+
+			model.addAttribute("entry", newEntry);
+			model.addAttribute("index", index);
+
+			return new HtmxResponse.Builder()
+				.view("guestbook :: entry")
+				.build();
 		}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 }
